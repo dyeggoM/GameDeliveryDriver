@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 using UnityEngine.Serialization;
 
 public class DeliveryCollision : MonoBehaviour
@@ -16,19 +15,24 @@ public class DeliveryCollision : MonoBehaviour
     [SerializeField] private float delayToLoadNextLevel = 1f;
     [SerializeField] private TextMeshProUGUI displayPackages;
     [SerializeField] private TextMeshProUGUI displayHits;
+    [SerializeField] private ParticleSystem crashParticleEffect;
+    private LevelManager _levelManager;
     private SpriteRenderer spriteRenderer;
     private int currentPackagesDelivered = 0;
     private int hitCounter = 0;
     private void Start()
     {
+        _levelManager = FindObjectOfType<LevelManager>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         ManageDisplayPackageInformation();
         ManageDisplayHitsInformation();
     }
 
+
     private void OnCollisionEnter2D(Collision2D other)
     {
         // Debug.Log($"Collision {other.gameObject.name}");
+        PlayCrashEffects();
         hitCounter++;
         ManageDisplayHitsInformation();
     }
@@ -63,16 +67,12 @@ public class DeliveryCollision : MonoBehaviour
             Invoke(nameof(LoadNextLevel), delayToLoadNextLevel);
         }
     }
-    
+
     private void LoadNextLevel()
     {
-        int nextSceneIndex = SceneManager.GetActiveScene().buildIndex + 1;
-        if (nextSceneIndex == SceneManager.sceneCountInBuildSettings)
-        {
-            nextSceneIndex = 1;
-        }
-        SceneManager.LoadScene(nextSceneIndex);
+        _levelManager.LoadNextLevel();
     }
+    
     
     private void ManageDisplayPackageInformation()
     {
@@ -82,5 +82,10 @@ public class DeliveryCollision : MonoBehaviour
     private void ManageDisplayHitsInformation()
     {
         displayHits.text = $"Crashes: {hitCounter}";
+    }
+
+    private void PlayCrashEffects()
+    {
+        crashParticleEffect.Play();
     }
 }

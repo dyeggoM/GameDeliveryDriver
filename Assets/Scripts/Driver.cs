@@ -18,6 +18,7 @@ public class Driver : MonoBehaviour
     [SerializeField] private Joystick verticalJoystick;
     [SerializeField] private Joystick horizontalJoystick;
     [SerializeField] private int crashesCountToResetSpeed = 10;
+    [SerializeField] private bool isStandingRotationAllowed = true;
 
     private bool isMoving = false;
     private bool reverse = false;
@@ -84,7 +85,7 @@ public class Driver : MonoBehaviour
         ProcessHorizontalMovement();
         float reverseSteering = reverse ? 1 : -1;
         float steerAmount = horizontalMovement * steerSpeed * Time.deltaTime * reverseSteering;
-        if(isMoving)
+        if(isMoving || isStandingRotationAllowed)
             transform.Rotate(0f,0f, steerAmount);
     }
 
